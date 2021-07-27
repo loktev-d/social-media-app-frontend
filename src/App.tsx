@@ -8,8 +8,9 @@ import {
 } from "@material-ui/core";
 
 import useStyles from "./style";
-import logo from "./logo.png";
-import Navigation from "./navigation/Navigation";
+import logo from "./images/logo.png";
+import Navigation from "./components/navigation/Navigation";
+import Feed from "./components/feed/Feed";
 
 function App() {
   const classes = useStyles();
@@ -32,7 +33,9 @@ function App() {
             <Navigation />
           </Paper>
         </Grid>
-        <Grid item xs={9}></Grid>
+        <Grid item xs={9}>
+          <Feed />
+        </Grid>
       </Grid>
     </Container>
   );
