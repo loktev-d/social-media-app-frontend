@@ -1,11 +1,17 @@
+import { AxiosResponse } from "axios";
 import { all, call, put, takeLatest } from "redux-saga/effects";
 
 import * as api from "../api";
 import { GetAllPostsResponse } from "../api/dto";
+import { getAllPostsSucceeded } from "../components/feed/feedSlice";
 
-function* getAllPosts(): Generator<any, void, GetAllPostsResponse[]> {
+function* getAllPosts(): Generator<
+  any,
+  void,
+  AxiosResponse<GetAllPostsResponse[]>
+> {
   let posts = yield call(api.getAllPosts);
-  yield put({ type: "feed/getAllPostsSucceeded", payload: posts });
+  yield put(getAllPostsSucceeded(posts.data));
 }
 
 function* watchGetAllPosts(): Generator<any, void, any> {
