@@ -11,9 +11,9 @@ import {
 import moment from "moment";
 
 import useStyles from "./style";
-import { GetAllPostsResponse } from "../../../api/dto";
+import { PostModel } from "../../../api/dto";
 
-export default function Post({ post }: { post: GetAllPostsResponse }) {
+export default function Post({ post }: { post: PostModel }) {
   const [isExpanded, setIsExpanded] = useState(
     post.body.length > 200 ? false : true
   );
