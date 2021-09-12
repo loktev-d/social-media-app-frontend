@@ -6,11 +6,12 @@ import {
   Paper,
   Typography,
 } from "@material-ui/core";
+import { Switch, Route } from "react-router-dom";
 
 import useStyles from "./style";
 import logo from "./images/logo.png";
 import Navigation from "./components/navigation/Navigation";
-import Feed from "./components/feed/Feed";
+import { navItems } from "./nav-items";
 
 function App() {
   const classes = useStyles();
@@ -34,7 +35,13 @@ function App() {
           </Paper>
         </Grid>
         <Grid item xs={9}>
-          <Feed />
+          <Switch>
+            {navItems.map((item, index) => (
+              <Route key={index} path={item.route}>
+                <item.component />
+              </Route>
+            ))}
+          </Switch>
         </Grid>
       </Grid>
     </Container>

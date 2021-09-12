@@ -5,14 +5,15 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@material-ui/core";
+import { Link } from "react-router-dom";
 
-import { navItems } from "./nav-items";
+import { navItems } from "../../nav-items";
 
 function Navigation() {
   return (
     <List component="nav">
-      {navItems.map((item) => (
-        <ListItem key={item.name} button>
+      {navItems.map((item, index) => (
+        <ListItem key={index} button component={Link as any} to={item.route}>
           <ListItemIcon>
             <Icon>{item.icon}</Icon>
           </ListItemIcon>
