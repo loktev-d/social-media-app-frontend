@@ -9,6 +9,16 @@ export interface PostModel {
   createdBy: string;
 }
 
+export type GetAllUsersResponse = UserModel[];
+
+export interface UserModel {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  profilePicture: string;
+  bio: string;
+}
+
 export interface ErrorResponse {
   statusCode: number;
   message: string;

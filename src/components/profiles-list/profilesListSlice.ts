@@ -1,36 +1,36 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { GetAllPostsResponse, ErrorResponse } from "../../api/dto";
+import { GetAllUsersResponse, ErrorResponse } from "../../api/dto";
 
-interface FeedState {
+interface ProfilesListState {
   isLoading: boolean;
   isErrorMessageOpened: boolean;
   errorMessage: string;
-  feed: GetAllPostsResponse;
+  profiles: GetAllUsersResponse;
 }
 
-const initialState: FeedState = {
+const initialState: ProfilesListState = {
   isLoading: false,
   isErrorMessageOpened: false,
   errorMessage: "",
-  feed: [],
+  profiles: [],
 };
 
-const feedSlice = createSlice({
-  name: "feed",
+const profilesListSlice = createSlice({
+  name: "profilesList",
   initialState,
   reducers: {
     setLoading: (state) => {
       state.isLoading = true;
     },
-    getAllPostsSucceeded: (
+    getAllUsersSucceeded: (
       state,
-      action: PayloadAction<GetAllPostsResponse>
+      action: PayloadAction<GetAllUsersResponse>
     ) => {
       state.isLoading = false;
       state.errorMessage = "";
-      state.feed = action.payload;
+      state.profiles = action.payload;
     },
-    getAllPostsFailed: (state, action: PayloadAction<ErrorResponse>) => {
+    getAllUsersFailed: (state, action: PayloadAction<ErrorResponse>) => {
       state.isLoading = false;
       state.isErrorMessageOpened = true;
       state.errorMessage = action.payload.message;
@@ -42,10 +42,10 @@ const feedSlice = createSlice({
 });
 
 export const {
-  getAllPostsSucceeded,
+  getAllUsersSucceeded,
   setLoading,
-  getAllPostsFailed,
+  getAllUsersFailed,
   closeErrorMessage,
-} = feedSlice.actions;
+} = profilesListSlice.actions;
 
-export default feedSlice.reducer;
+export default profilesListSlice.reducer;
