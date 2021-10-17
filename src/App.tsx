@@ -6,7 +6,7 @@ import {
   Paper,
   Typography,
 } from "@material-ui/core";
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route, Redirect } from "react-router-dom";
 
 import useStyles from "./style";
 import logo from "./images/logo.png";
@@ -14,7 +14,7 @@ import Navigation from "./components/navigation/Navigation";
 import { navItems } from "./nav-items";
 
 function App() {
-  const classes = useStyles();
+  let classes = useStyles();
 
   return (
     <Container maxWidth="md">
@@ -41,6 +41,9 @@ function App() {
                 <item.component />
               </Route>
             ))}
+            <Route path="/">
+              <Redirect to="/feed" />
+            </Route>
           </Switch>
         </Grid>
       </Grid>

@@ -2,64 +2,58 @@ import { AxiosResponse, AxiosError } from "axios";
 import { all, call, put, takeLatest } from "redux-saga/effects";
 
 import * as api from "../api";
-import {
-  ErrorResponse,
-  GetAllPostsResponse,
-  GetAllUsersResponse,
-} from "../api/dto";
+import { ErrorResponse } from "../api/dto";
 import {
   getAllPostsSucceeded,
-  setLoading as setFeedLoading,
   getAllPostsFailed,
 } from "../components/feed/feedSlice";
 import {
   getAllUsersSucceeded,
   getAllUsersFailed,
-  setLoading as setProfilesListLoading,
 } from "../components/profiles-list/profilesListSlice";
+import { startLoading, completeLoading } from "../appSlice";
 
-function* getAllPosts(): Generator<
-  any,
-  void,
-  AxiosResponse<GetAllPostsResponse>
-> {
-  yield put(setFeedLoading());
+function* sendRequest(
+  apiMethod: (request: any) => Promise<AxiosResponse<any>>,
+  request: any,
+  successAction: (payload: any) => any,
+  errorAction: (payload: ErrorResponse) => any
+): Generator<any, void, AxiosResponse<any>> {
+  yield put(startLoading());
   try {
-    let posts = yield call(api.getAllPosts);
-    yield put(getAllPostsSucceeded(posts.data));
+    let response = yield call(apiMethod, request);
+    yield put(successAction(response.data));
   } catch (error) {
     yield put(
-      getAllPostsFailed(
+      errorAction(
         (error as AxiosError<ErrorResponse>).response?.data as ErrorResponse
       )
     );
+  } finally {
+    yield put(completeLoading());
   }
 }
 
 function* watchGetAllPosts(): Generator<any, void, any> {
-  yield takeLatest("feed/requestGetAllPosts", getAllPosts);
-}
-
-function* getAllUsers(): Generator<
-  any,
-  void,
-  AxiosResponse<GetAllUsersResponse>
-> {
-  yield put(setProfilesListLoading());
-  try {
-    let users = yield call(api.getAllUsers);
-    yield put(getAllUsersSucceeded(users.data));
-  } catch (error) {
-    yield put(
-      getAllUsersFailed(
-        (error as AxiosError<ErrorResponse>).response?.data as ErrorResponse
-      )
-    );
-  }
+  yield takeLatest(
+    "feed/requestGetAllPosts",
+    sendRequest,
+    api.getAllPosts,
+    null,
+    getAllPostsSucceeded,
+    getAllPostsFailed
+  );
 }
 
 function* watchGetAllUsers(): Generator<any, void, any> {
-  yield takeLatest("feed/requestGetAllUsers", getAllUsers);
+  yield takeLatest(
+    "feed/requestGetAllUsers",
+    sendRequest,
+    api.getAllUsers,
+    null,
+    getAllUsersSucceeded,
+    getAllUsersFailed
+  );
 }
 
 export function* rootSaga(): Generator<any, void, any> {
