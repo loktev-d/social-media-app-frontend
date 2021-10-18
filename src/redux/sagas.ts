@@ -47,7 +47,7 @@ function* watchGetAllPosts(): Generator<any, void, any> {
 
 function* watchGetAllUsers(): Generator<any, void, any> {
   yield takeLatest(
-    "feed/requestGetAllUsers",
+    "profilesList/requestGetAllUsers",
     sendRequest,
     api.getAllUsers,
     null,
