@@ -1,5 +1,6 @@
 import { AxiosResponse, AxiosError } from "axios";
 import { all, call, put, takeLatest } from "redux-saga/effects";
+import { PayloadAction } from "@reduxjs/toolkit";
 
 import * as api from "../api";
 import { ErrorResponse } from "../api/dto";
@@ -11,17 +12,21 @@ import {
   getAllUsersSucceeded,
   getAllUsersFailed,
 } from "../components/profiles-list/profilesListSlice";
+import {
+  getUserSucceeded,
+  getUserFailed,
+} from "../components/profile/profileSlice";
 import { startLoading, completeLoading } from "../appSlice";
 
 function* sendRequest(
   apiMethod: (request: any) => Promise<AxiosResponse<any>>,
-  request: any,
   successAction: (payload: any) => any,
-  errorAction: (payload: ErrorResponse) => any
+  errorAction: (payload: ErrorResponse) => any,
+  action: PayloadAction<any>
 ): Generator<any, void, AxiosResponse<any>> {
   yield put(startLoading());
   try {
-    let response = yield call(apiMethod, request);
+    let response = yield call(apiMethod, action?.payload);
     yield put(successAction(response.data));
   } catch (error) {
     yield put(
@@ -39,7 +44,6 @@ function* watchGetAllPosts(): Generator<any, void, any> {
     "feed/requestGetAllPosts",
     sendRequest,
     api.getAllPosts,
-    null,
     getAllPostsSucceeded,
     getAllPostsFailed
   );
@@ -50,12 +54,21 @@ function* watchGetAllUsers(): Generator<any, void, any> {
     "profilesList/requestGetAllUsers",
     sendRequest,
     api.getAllUsers,
-    null,
     getAllUsersSucceeded,
     getAllUsersFailed
   );
 }
 
+function* watchGetUser(): Generator<any, void, any> {
+  yield takeLatest(
+    "profile/requestGetUser",
+    sendRequest,
+    api.getUser,
+    getUserSucceeded,
+    getUserFailed
+  );
+}
+
 export function* rootSaga(): Generator<any, void, any> {
-  yield all([watchGetAllPosts(), watchGetAllUsers()]);
+  yield all([watchGetAllPosts(), watchGetAllUsers(), watchGetUser()]);
 }

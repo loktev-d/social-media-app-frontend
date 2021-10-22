@@ -7,11 +7,13 @@ import {
   Paper,
 } from "@material-ui/core/";
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { Error } from "../error/Error";
 import { Loading } from "../loading/Loading";
 import { closeErrorMessage } from "./profilesListSlice";
+import routes from "../../routes";
 
 export default function ProfilesList() {
   const dispatch = useAppDispatch();
@@ -28,7 +30,12 @@ export default function ProfilesList() {
     <Paper>
       <List>
         {store.profiles.map((profile) => (
-          <ListItem key={profile._id} button>
+          <ListItem
+            key={profile._id}
+            button
+            component={Link}
+            to={routes.profileById.getPathWithParam(profile._id)}
+          >
             <ListItemAvatar>
               <Avatar
                 src={`data:image/png;base64, ${profile.profilePicture}`}

@@ -13,7 +13,7 @@ function Navigation() {
   return (
     <List component="nav">
       {navItems.map((item, index) => (
-        <ListItem key={index} button component={Link as any} to={item.route}>
+        <ListItem key={index} button component={Link as any} to={item.path}>
           <ListItemIcon>
             <Icon>{item.icon}</Icon>
           </ListItemIcon>

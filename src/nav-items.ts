@@ -1,18 +1,15 @@
-import Feed from "./components/feed/Feed";
-import ProfilesList from "./components/profiles-list/ProfilesList";
+import routes from "./routes";
 
 export const navItems = [
   {
     icon: "account_circle",
     name: "My Profile",
-    route: "/profile",
-    component: Feed,
+    path: routes.profileById.getPathWithParam("616d5c7c4de1f9070a39bcb1"),
   },
-  { icon: "feed", name: "Feed", route: "/feed", component: Feed },
+  { icon: "feed", name: "Feed", path: routes.feed.path },
   {
     icon: "people",
     name: "Profiles",
-    route: "/profiles",
-    component: ProfilesList,
+    path: routes.profiles.path,
   },
 ];

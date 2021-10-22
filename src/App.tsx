@@ -11,7 +11,7 @@ import { Switch, Route, Redirect } from "react-router-dom";
 import useStyles from "./style";
 import logo from "./images/logo.png";
 import Navigation from "./components/navigation/Navigation";
-import { navItems } from "./nav-items";
+import routes from "./routes";
 
 function App() {
   let classes = useStyles();
@@ -36,10 +36,8 @@ function App() {
         </Grid>
         <Grid item xs={9}>
           <Switch>
-            {navItems.map((item, index) => (
-              <Route key={index} path={item.route}>
-                <item.component />
-              </Route>
+            {Object.entries(routes).map(([key, value]) => (
+              <Route key={key} path={value.path} component={value.component} />
             ))}
             <Route path="/">
               <Redirect to="/feed" />
