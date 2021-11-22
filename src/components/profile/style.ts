@@ -2,7 +2,10 @@ import { makeStyles, createStyles } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
-    paper: {
+    paperBio: {
+      padding: `${theme.spacing(2)}px ${theme.spacing(3)}px`,
+    },
+    paperAvatar: {
       padding: theme.spacing(1),
     },
     avatarContainer: {

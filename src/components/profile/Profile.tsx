@@ -30,7 +30,7 @@ export default function Profile() {
     <>
       <Grid container spacing={1}>
         <Grid item xs={4}>
-          <Paper className={classes.paper}>
+          <Paper className={classes.paperAvatar}>
             <Box className={classes.avatarContainer}>
               {store.user?.profilePicture ? (
                 <img
@@ -43,7 +43,7 @@ export default function Profile() {
           </Paper>
         </Grid>
         <Grid item xs={8}>
-          <Paper className={classes.paper}>
+          <Paper className={classes.paperBio}>
             <Typography variant="h5">{`${store.user?.firstName} ${store.user?.lastName}`}</Typography>
             <Divider className={classes.divider} />
             <Box>
