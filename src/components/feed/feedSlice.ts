@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { GetAllPostsResponse, ErrorResponse } from "../../api/dto";
+import { GetAllPostsResponse, ErrorResponse, PostModel } from "../../api/dto";
 
 interface FeedState {
   isErrorMessageOpened: boolean;
@@ -17,24 +17,24 @@ const feedSlice = createSlice({
   name: "feed",
   initialState,
   reducers: {
-    getAllPostsSucceeded: (
-      state,
-      action: PayloadAction<GetAllPostsResponse>
-    ) => {
-      state.errorMessage = "";
+    getAllPosts: (state, action: PayloadAction<GetAllPostsResponse>) => {
       state.feed = action.payload;
     },
-    getAllPostsFailed: (state, action: PayloadAction<ErrorResponse>) => {
+    getNewPost: (state, action: PayloadAction<PostModel>) => {
+      state.feed.splice(0, 0, action.payload);
+    },
+    openErrorMessage: (state, action: PayloadAction<ErrorResponse>) => {
       state.isErrorMessageOpened = true;
       state.errorMessage = action.payload.message;
     },
     closeErrorMessage: (state) => {
+      state.errorMessage = "";
       state.isErrorMessageOpened = false;
     },
   },
 });
 
-export const { getAllPostsSucceeded, getAllPostsFailed, closeErrorMessage } =
+export const { getAllPosts, getNewPost, openErrorMessage, closeErrorMessage } =
   feedSlice.actions;
 
 export default feedSlice.reducer;

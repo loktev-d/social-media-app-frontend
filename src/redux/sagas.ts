@@ -1,12 +1,24 @@
 import { AxiosResponse, AxiosError } from "axios";
-import { all, call, put, takeLatest } from "redux-saga/effects";
+import {
+  all,
+  call,
+  put,
+  takeLatest,
+  fork,
+  take,
+  cancel,
+  cancelled,
+} from "redux-saga/effects";
+import { eventChannel, EventChannel } from "redux-saga";
 import { PayloadAction } from "@reduxjs/toolkit";
+import { io, Socket } from "socket.io-client";
 
 import * as api from "../api";
 import { ErrorResponse } from "../api/dto";
 import {
-  getAllPostsSucceeded,
-  getAllPostsFailed,
+  getAllPosts,
+  getNewPost,
+  openErrorMessage,
 } from "../components/feed/feedSlice";
 import {
   getAllUsersSucceeded,
@@ -17,6 +29,8 @@ import {
   getUserFailed,
 } from "../components/profile/profileSlice";
 import { startLoading, completeLoading } from "../appSlice";
+import { apiUrl } from "../config/config.json";
+import { SocketChannelResponse } from "./interfaces";
 
 function* sendRequest(
   apiMethod: (request: any) => Promise<AxiosResponse<any>>,
@@ -39,16 +53,6 @@ function* sendRequest(
   }
 }
 
-function* watchGetAllPosts(): Generator<any, void, any> {
-  yield takeLatest(
-    "feed/requestGetAllPosts",
-    sendRequest,
-    api.getAllPosts,
-    getAllPostsSucceeded,
-    getAllPostsFailed
-  );
-}
-
 function* watchGetAllUsers(): Generator<any, void, any> {
   yield takeLatest(
     "profilesList/requestGetAllUsers",
@@ -69,6 +73,78 @@ function* watchGetUser(): Generator<any, void, any> {
   );
 }
 
+function createPostChannel(
+  socket: Socket<any, any>
+): EventChannel<SocketChannelResponse> {
+  return eventChannel((emit) => {
+    socket.on("all_posts", (data: any) => {
+      emit({ event: "all_posts", data });
+    });
+
+    socket.on("new_post", (data: any) => {
+      emit({ event: "new_post", data });
+    });
+
+    socket.on("error", (data: any) => {
+      emit({ event: "error", data });
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  });
+}
+
+function* createPost(
+  socket: Socket<any, any>,
+  action: PayloadAction<any>
+): Generator<any, void, any> {
+  if (socket.connected)
+    yield call([socket, socket.emit], "create_post", action.payload);
+  //if (socket.connected) yield socket.emit("create_post", action.payload);
+}
+
+function* watchCreatePost(socket: Socket<any, any>): Generator<any, void, any> {
+  yield takeLatest("feed/createPost", createPost, socket);
+}
+
+function* getPosts(): Generator<any, void, any> {
+  let socket = yield call(io, apiUrl);
+
+  let socketChannel: EventChannel<SocketChannelResponse> = yield call(
+    createPostChannel,
+    socket
+  );
+
+  yield fork(watchCreatePost, socket);
+
+  try {
+    while (true) {
+      let message: SocketChannelResponse = yield take(socketChannel);
+
+      switch (message.event) {
+        case "all_posts":
+          yield put(getAllPosts(message.data));
+          break;
+
+        case "new_post":
+          yield put(getNewPost(message.data));
+          break;
+      }
+    }
+  } finally {
+    if (yield cancelled()) yield call(socketChannel.close);
+  }
+}
+
+function* watchPostsChannel(): Generator<any, void, any> {
+  while (yield take("feed/connectToChannel")) {
+    let getPostsTask = yield fork(getPosts);
+    yield take("feed/disconnectFromChannel");
+    yield cancel(getPostsTask);
+  }
+}
+
 export function* rootSaga(): Generator<any, void, any> {
-  yield all([watchGetAllPosts(), watchGetAllUsers(), watchGetUser()]);
+  yield all([watchPostsChannel(), watchGetAllUsers(), watchGetUser()]);
 }

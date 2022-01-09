@@ -14,7 +14,11 @@ export default function Feed() {
   const isLoading = useAppSelector((state) => state.app.isLoading);
 
   useEffect(() => {
-    dispatch({ type: "feed/requestGetAllPosts" });
+    dispatch({ type: "feed/connectToChannel" });
+
+    return () => {
+      dispatch({ type: "feed/disconnectFromChannel" });
+    };
   }, []);
 
   return isLoading ? (

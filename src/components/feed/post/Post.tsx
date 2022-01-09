@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -19,12 +19,23 @@ export default function Post({ post }: { post: PostModel }) {
   );
   const classes = useStyles({ isExpanded });
 
+  const [createdFromNow, setCreatedFromNow] = useState(
+    moment(post.created).fromNow()
+  );
+
+  const refreshCreatedFromNow = setInterval(() => {
+    setCreatedFromNow(moment(post.created).fromNow());
+  }, 60000);
+
+  useEffect(() => {
+    return () => {
+      clearInterval(refreshCreatedFromNow);
+    };
+  });
+
   return (
     <Card className={classes.post}>
-      <CardHeader
-        title={post.title}
-        subheader={moment(post.created).fromNow()}
-      />
+      <CardHeader title={post.title} subheader={createdFromNow} />
       <CardMedia
         component="img"
         src={`data:image/jpeg;base64, ${post.picture}`}

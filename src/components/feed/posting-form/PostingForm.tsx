@@ -9,11 +9,16 @@ import {
 } from "@material-ui/core";
 import useStyles from "./style";
 import { useState, FocusEvent, ChangeEvent } from "react";
+import { changeBody, changeTitle, changePicture } from "./postingFormSlice";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 
 export default function PostingForm() {
   const classes = useStyles();
   const [isExpanded, setIsExpanded] = useState(false);
   const [fileName, setFileName] = useState("");
+
+  const dispatch = useAppDispatch();
+  const formState = useAppSelector((state) => state.postingForm);
 
   return (
     <Paper className={classes.paper}>
@@ -30,6 +35,9 @@ export default function PostingForm() {
             onBlur={(event: FocusEvent<HTMLInputElement>) => {
               if (!event.target.value) setIsExpanded(false);
             }}
+            onChange={(event) => {
+              dispatch(changeTitle(event.target.value));
+            }}
           />
         </Grid>
         {isExpanded ? (
@@ -41,6 +49,9 @@ export default function PostingForm() {
                 multiline
                 fullWidth
                 rows={4}
+                onChange={(event) => {
+                  dispatch(changeBody(event.target.value));
+                }}
               />
             </Grid>
             <Grid
@@ -60,6 +71,25 @@ export default function PostingForm() {
                   setFileName(
                     event.target.files ? event.target.files[0].name : ""
                   );
+
+                  if (!event.target.files || !event.target.files.length) {
+                    dispatch(changePicture(""));
+                    return;
+                  }
+
+                  const reader = new FileReader();
+
+                  reader.onload = () => {
+                    dispatch(
+                      changePicture(
+                        reader.result
+                          ?.toString()
+                          .replace(new RegExp("data:.*/.*;base64,"), "")
+                      )
+                    );
+                  };
+
+                  reader.readAsDataURL(event.target.files[0]);
                 }}
               />
               <label htmlFor="upload-file-input">
@@ -77,6 +107,12 @@ export default function PostingForm() {
                 variant="contained"
                 color="primary"
                 endIcon={<Icon>send</Icon>}
+                onClick={() => {
+                  dispatch({
+                    type: "feed/createPost",
+                    payload: formState,
+                  });
+                }}
               >
                 Submit
               </Button>
