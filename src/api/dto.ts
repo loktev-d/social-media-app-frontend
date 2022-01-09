@@ -9,13 +9,6 @@ export interface PostModel {
   createdBy: string;
 }
 
-export interface CreatePostDto {
-  firstName: string;
-  lastName: string;
-  profilePicture: string;
-  bio: string;
-}
-
 export type GetAllUsersResponse = UserModel[];
 
 export interface UserModel {
