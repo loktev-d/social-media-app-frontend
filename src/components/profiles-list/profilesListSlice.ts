@@ -29,6 +29,7 @@ const profilesListSlice = createSlice({
       state.errorMessage = action.payload.message;
     },
     closeErrorMessage: (state) => {
+      state.errorMessage = "";
       state.isErrorMessageOpened = false;
     },
   },

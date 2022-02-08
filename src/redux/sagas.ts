@@ -85,8 +85,8 @@ function createPostChannel(
       emit({ event: "new_post", data });
     });
 
-    socket.on("error", (data: any) => {
-      emit({ event: "error", data });
+    socket.on("exception", (data: any) => {
+      emit({ event: "exception", data });
     });
 
     return () => {
@@ -101,7 +101,6 @@ function* createPost(
 ): Generator<any, void, any> {
   if (socket.connected)
     yield call([socket, socket.emit], "create_post", action.payload);
-  //if (socket.connected) yield socket.emit("create_post", action.payload);
 }
 
 function* watchCreatePost(socket: Socket<any, any>): Generator<any, void, any> {
@@ -129,6 +128,10 @@ function* getPosts(): Generator<any, void, any> {
 
         case "new_post":
           yield put(getNewPost(message.data));
+          break;
+
+        case "exception":
+          yield put(openErrorMessage(message.data));
           break;
       }
     }
